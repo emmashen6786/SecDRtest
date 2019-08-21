@@ -12,6 +12,7 @@ class RequestConfigSerializer(serializers.ModelSerializer):
     query_param_template = serializers.JSONField()
     form_param_template = serializers.JSONField()
     body_param_template = serializers.JSONField()
+    file_param_template = serializers.JSONField()
 
     class Meta:
         model = RequestConfig
@@ -32,6 +33,7 @@ class ResponseConfigSerializer(serializers.ModelSerializer):
 
 class DefaultPublicParamSerializer(serializers.ModelSerializer):
     publice_params = serializers.JSONField()
+    product_code=serializers.JSONField()
 
     class Meta:
         model = DefaultPublicParam
@@ -211,10 +213,13 @@ class ResultGroupUpdateSerializer(serializers.ModelSerializer):
 
 class StartAutoApiSerializer(serializers.ModelSerializer):
     request_group = serializers.ReadOnlyField(source='id')
+    # market_channel_code = serializers.CharField()
+    result_group = serializers.IntegerField()
+    default_params_id=serializers.IntegerField
 
     class Meta:
         model = RequestGroup
-        fields = ('request_group', 'market_channel_code', 'result_group')
+        fields = ('request_group', 'result_group','default_params_id')
 
 
 class AutomationReportSendConfigSerializer(serializers.ModelSerializer):

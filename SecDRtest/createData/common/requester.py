@@ -43,12 +43,17 @@ class Requester:
                                 if isinstance(v, str) and v.startswith("$"):
                                     if dynamicParams.__contains__(k):
                                         paramValue[k] = dynamicParams.get(v.split("$")[-1], v)
+                                    elif dynamicParams.__contains__(v.split("$")[-1]):
+                                        paramValue[k] = dynamicParams.get(v.split("$")[-1], v)
                                     elif key == "channel_id":
                                         param[key] = self.channel_id
                                     elif key == "productCode":
                                         param[key] = self.product_code
                                     elif key == "sub_product_code":
                                         param[key] = self.sub_product_code
+                                    elif key == "market_channel_code":
+                                        param[key] = self.market_channel_code
+
                                 elif isinstance(v, dict):
                                     self.prepareParam(v, dynamicParams)
                 elif isinstance(value, dict):
@@ -159,17 +164,54 @@ class Requester:
         return sql
 
     def setPost(self, session):
-        if self.body_param_template:
-            if self.query_param_template:
-                resp = session.post(self.url, params=self.query_param_template, json=self.body_param_template,
-                                    headers=self.header)
+        if not self.file_param_template:
+            if self.body_param_template:
+                if self.query_param_template:
+                    resp = session.post(self.url, params=self.query_param_template, json=self.body_param_template,
+                                        headers=self.header)
+                    return resp
+                else:
+                    resp = session.post(self.url, json=self.body_param_template, headers=self.header)
+                    return resp
+            elif self.query_param_template:
+                resp = session.post(self.url, params=self.query_param_template, headers=self.header)
                 return resp
+
+        elif self.file_param_template:
+            filesParams = {}
+            if isinstance(self.file_param_template, dict):
+                for k in self.file_param_template:
+                    filesParams[k] = open(self.file_param_template[k], "rb")
+                if self.body_param_template:
+                    if self.query_param_template:
+                        resp = session.post(self.url, params=self.query_param_template, json=self.body_param_template,
+                                            files=filesParams, headers=self.header)
+                        return resp
+                    else:
+                        resp = session.post(self.url, json=self.body_param_template, files=filesParams,
+                                            headers=self.header)
+                        return resp
+                elif self.query_param_template:
+                    resp = session.post(self.url, params=self.query_param_template, files=filesParams,
+                                        headers=self.header)
+                    return resp
             else:
-                resp = session.post(self.url, json=self.body_param_template, headers=self.header)
-                return resp
-        elif self.query_param_template:
-            resp = session.post(self.url, params=self.query_param_template, headers=self.header)
-            return resp
+                self.file_param_template = eval(self.file_param_template)
+                for k in self.file_param_template:
+                    filesParams[k] = open(self.file_param_template[k], "rb")
+                if self.body_param_template:
+                    if self.query_param_template:
+                        resp = session.post(self.url, params=self.query_param_template, json=self.body_param_template,
+                                            files=filesParams, headers=self.header)
+                        return resp
+                    else:
+                        resp = session.post(self.url, json=self.body_param_template, files=filesParams,
+                                            headers=self.header)
+                        return resp
+                elif self.query_param_template:
+                    resp = session.post(self.url, params=self.query_param_template, files=filesParams,
+                                        headers=self.header)
+                    return resp
 
     def setGet(self, session):
         if not self.query_param_template:

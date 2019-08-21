@@ -15,6 +15,10 @@ logger = logging.getLogger("django.request.autoApi")
 
 class StartAutoApiViewSet(APIView):
     serializer_class = serializers.StartAutoApiSerializer
+
+    def get_serializer_class(self):
+        return self.serializer_class
+
     def parameter_check(self, data):
         """
         校验参数
@@ -24,9 +28,9 @@ class StartAutoApiViewSet(APIView):
         try:
             # 校验request_group, id类型为int
             if not data["request_group"]:
-                return JsonResponse(code="999996", msg="参数有误！")
+                return JsonResponse(code="999996", msg="request_group未填写！")
             if not isinstance(data["request_group"], int):
-                return JsonResponse(code="999996", msg="参数有误！")
+                return JsonResponse(code="999996", msg="request_group类型错误！")
         except KeyError:
             return JsonResponse(code="999996", msg="参数有误！")
 
@@ -49,7 +53,7 @@ class StartAutoApiViewSet(APIView):
         except ObjectDoesNotExist:
             return JsonResponse(code="999987", msg="关联的请求不存在！")
         try:
-            public_data = models.DefaultPublicParam.objects.get(market_channel_code=data["market_channel_code"])
+            public_data = models.DefaultPublicParam.objects.get(id=data["default_params_id"])
         except ObjectDoesNotExist:
             return JsonResponse(code="999987", msg="关联的默认参数不存在！")
 

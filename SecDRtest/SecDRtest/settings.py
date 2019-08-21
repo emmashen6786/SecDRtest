@@ -37,7 +37,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'createData',
     'rest_framework',
-    'rest_framework_swagger',
 ]
 
 MIDDLEWARE = [
@@ -140,7 +139,7 @@ LOGGING = {
         },
         'request_fmt': {
             'format': f'[%(asctime)s] [%(name)s] %(filename)s[line:%(lineno)d] %(levelname)s: %(message)s'
-            f' [%(x_dianrong_app_id)s]',
+            f' [%(x_shuiguowei_app_id)s]',
             'datefmt': '%Y-%m-%d %H:%M:%S',
         },
     },
